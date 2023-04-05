@@ -1,10 +1,13 @@
 #include "mainwindow.h"
+#include <QContextMenuEvent>
 #include <QGridLayout>
 #include <QDebug>
 #include <QLabel>
 #include <QListView>
 #include <QPushButton>
 #include <QStringListModel>
+#include <QMenuBar>
+#include <QWidgetAction>
 using namespace std;
 
 MainWindow::MainWindow(QWidget *parent)
@@ -32,7 +35,9 @@ MainWindow::MainWindow(QWidget *parent)
     centralWidgetLayout->addLayout(rightSection, 0, 1);
     centralWidgetLayout->addLayout(bottomSection, 1, 0, 1, 2);
 
-   setCentralWidget(centralWidget);
+    setCentralWidget(centralWidget);
+    m_createActions();
+    m_createMenus();
 }
 
 MainWindow::~MainWindow()
@@ -50,11 +55,12 @@ QVBoxLayout *MainWindow::m_getCategoriesLayout()
     list << "Работа" << "Соцсети" << "Разное";
     categoriesModel->setStringList(list);
 
-    QListView *categoriesListView = new QListView();
-
+    categoriesListView = new QListView();
     categoriesListView->setWordWrap(true);
     categoriesListView->setModel(categoriesModel);
     categoriesListView->setCurrentIndex(categoriesModel->index(0, 0));
+
+//    connect(categoriesListView, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(slotCustomMenuRequested(QPoint)));
 
     layout->addWidget(layoutLabel);
     layout->addWidget(categoriesListView);
@@ -127,16 +133,21 @@ QGridLayout *MainWindow::m_getDetailsButtons()
     showPasswordButton = new QPushButton(tr("Показать пароль"));
     editButton = new QPushButton(tr("Редактировать"));
     connect(editButton, SIGNAL(clicked()),this,SLOT(m_editModeEnter()));
-    // Еще нужно копирование пароля в буфер
     layout->addWidget(showPasswordButton, 0, 0);
     layout->addWidget(editButton, 0, 1);
 
     generateButton = new QPushButton(tr("Сгенерировать пароль"));
+    cancelButton = new QPushButton(tr("Отменить"));
+    connect(cancelButton, SIGNAL(clicked()),this,SLOT(m_editModeExit()));
     saveButton = new QPushButton(tr("Сохранить"));
     connect(saveButton, SIGNAL(clicked()),this,SLOT(m_editModeExit()));
+
     layout->addWidget(generateButton, 1, 0);
-    layout->addWidget(saveButton, 1, 1);
+    layout->addWidget(cancelButton, 1, 1);
+    layout->addWidget(saveButton, 1, 2);
+
     generateButton->setHidden(true);
+    cancelButton->setHidden(true);
     saveButton->setHidden(true);
 
     return layout;
@@ -144,18 +155,58 @@ QGridLayout *MainWindow::m_getDetailsButtons()
 
 void MainWindow::m_editModeEnter()
 {
+    for (auto editline : {urlLine, usernameLine, passwordLine, commentLine}) {
+        editline->setReadOnly(false);
+    }
+
     copyButton->setEnabled(false);
+
     showPasswordButton->setHidden(true);
     editButton->setHidden(true);
     generateButton->setHidden(false);
+    cancelButton->setHidden(false);
     saveButton->setHidden(false);
 }
 
 void MainWindow::m_editModeExit()
 {
+    for (auto editline : {urlLine, usernameLine, passwordLine, commentLine}) {
+        editline->setReadOnly(true);
+    }
+
     copyButton->setEnabled(true);
+
     showPasswordButton->setHidden(false);
     editButton->setHidden(false);
     generateButton->setHidden(true);
+    cancelButton->setHidden(true);
     saveButton->setHidden(true);
+}
+
+void MainWindow::m_createMenus()
+{
+    menu = menuBar()->addMenu(tr("&Меню"));
+//    categoryMenu = menu->addMenu(tr("&Категория"));
+    menu->addAction(addCategory);
+    menu->addAction(deleteCategory);
+    menu->addSeparator();
+    menu->addAction(addService);
+    menu->addAction(deleteService);
+
+    QWidgetAction *plog = new QWidgetAction(this);
+
+}
+
+void MainWindow::m_createActions()
+{
+    addCategory = new QAction(tr("&Добавить категорию"), this);
+    addCategory->setShortcuts(QKeySequence::New);
+    addCategory->setStatusTip(tr("Добавить новую категорию"));
+//    connect(newAct, &QAction::triggered, this, &MainWindow::addCategory);
+
+    deleteCategory = new QAction(tr("&Удалить выбранную категорию"), this);
+
+    addService = new QAction(tr("&Добавить сервис"), this);
+    deleteService = new QAction(tr("&Удалить выбранный сервис"), this);
+
 }
