@@ -1,6 +1,7 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
+#include <QClipboard>
 #include <QLineEdit>
 #include <QListView>
 #include <QMainWindow>
@@ -32,6 +33,7 @@ private:
     QAction *addService;
     QAction *deleteCategory;
     QAction *deleteService;
+    QClipboard *clipboard;
     QLineEdit *commentLine;
     QLineEdit *dateModifiedLine;
     QLineEdit *passwordLine;
@@ -46,7 +48,7 @@ private:
     QPushButton *editButton;
     QPushButton *generateButton;
     QPushButton *saveButton;
-    QPushButton *showPasswordButton;
+    QPushButton *showHidePasswordButton;
 
     service_t service;
     QGridLayout *m_getDetailsButtons();
@@ -59,8 +61,10 @@ private:
     void m_createMenus();
 
 private slots:
+    void m_copyPasswordToClipboard();
     void m_editModeEnter();
     void m_editModeExit();
-//    void slotCustomMenuRequested(QPoint pos);
+    void m_hidePassword();
+    void m_showPassword();
 };
 #endif // MAINWINDOW_H

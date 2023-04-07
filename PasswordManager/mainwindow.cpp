@@ -1,14 +1,15 @@
 #include "mainwindow.h"
+#include <QApplication>
 #include <QContextMenuEvent>
-#include <QGridLayout>
 #include <QDebug>
+#include <QGridLayout>
 #include <QLabel>
-#include <QListView>
-#include <QPushButton>
-#include <QStringListModel>
 #include <QMenuBar>
+#include <QStringListModel>
 #include <QWidgetAction>
 using namespace std;
+
+const char* TEXT_PASSWORD_HIDDEN = "*****";
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -17,7 +18,7 @@ MainWindow::MainWindow(QWidget *parent)
         "GitHub",
         "https://github.com/",
         "user1",
-        "*****",
+        "1q2w3e",
         "test test test",
         ""
     };
@@ -38,6 +39,8 @@ MainWindow::MainWindow(QWidget *parent)
     setCentralWidget(centralWidget);
     m_createActions();
     m_createMenus();
+
+    clipboard = QApplication::clipboard();
 }
 
 MainWindow::~MainWindow()
@@ -105,13 +108,14 @@ QGridLayout *MainWindow::m_getDetailsLayout()
     layout->addWidget(usernameLine, 1, 1, 1, 2);
 
     QLabel *passwordLabel = new QLabel(tr("Пароль:"));
-    passwordLine = new QLineEdit(service.password, this);
+    passwordLine = new QLineEdit(tr(TEXT_PASSWORD_HIDDEN), this);
     passwordLine->setReadOnly(true);
     layout->addWidget(passwordLabel, 2, 0);
     layout->addWidget(passwordLine, 2, 1);
 
     copyButton = new QPushButton(tr("Скопировать пароль в буфер"));
     layout->addWidget(copyButton, 2, 2);
+    connect(copyButton, SIGNAL(clicked()),this,SLOT(m_copyPasswordToClipboard()));
 
     QLabel *commentLabel = new QLabel(tr("Комментарий:"));
     commentLine = new QLineEdit(service.comment, this); // QTextEdit(service.comment, this);
@@ -119,7 +123,6 @@ QGridLayout *MainWindow::m_getDetailsLayout()
 
     layout->addWidget(commentLabel, 3, 0, Qt::AlignTop);
     layout->addWidget(commentLine, 3, 1, 1, 2);
-
 
     layout->addLayout(m_getDetailsButtons(), 4, 1, 1, 2);
 
@@ -130,15 +133,19 @@ QGridLayout *MainWindow::m_getDetailsButtons()
 {
     QGridLayout *layout = new QGridLayout;
 
-    showPasswordButton = new QPushButton(tr("Показать пароль"));
+    showHidePasswordButton = new QPushButton(tr("Показать пароль"));
+    connect(showHidePasswordButton, SIGNAL(clicked()),this,SLOT(m_showPassword()));
+
     editButton = new QPushButton(tr("Редактировать"));
     connect(editButton, SIGNAL(clicked()),this,SLOT(m_editModeEnter()));
-    layout->addWidget(showPasswordButton, 0, 0);
+    layout->addWidget(showHidePasswordButton, 0, 0);
     layout->addWidget(editButton, 0, 1);
 
     generateButton = new QPushButton(tr("Сгенерировать пароль"));
+
     cancelButton = new QPushButton(tr("Отменить"));
     connect(cancelButton, SIGNAL(clicked()),this,SLOT(m_editModeExit()));
+
     saveButton = new QPushButton(tr("Сохранить"));
     connect(saveButton, SIGNAL(clicked()),this,SLOT(m_editModeExit()));
 
@@ -161,7 +168,7 @@ void MainWindow::m_editModeEnter()
 
     copyButton->setEnabled(false);
 
-    showPasswordButton->setHidden(true);
+    showHidePasswordButton->setHidden(true);
     editButton->setHidden(true);
     generateButton->setHidden(false);
     cancelButton->setHidden(false);
@@ -176,7 +183,7 @@ void MainWindow::m_editModeExit()
 
     copyButton->setEnabled(true);
 
-    showPasswordButton->setHidden(false);
+    showHidePasswordButton->setHidden(false);
     editButton->setHidden(false);
     generateButton->setHidden(true);
     cancelButton->setHidden(true);
@@ -186,15 +193,11 @@ void MainWindow::m_editModeExit()
 void MainWindow::m_createMenus()
 {
     menu = menuBar()->addMenu(tr("&Меню"));
-//    categoryMenu = menu->addMenu(tr("&Категория"));
     menu->addAction(addCategory);
     menu->addAction(deleteCategory);
     menu->addSeparator();
     menu->addAction(addService);
     menu->addAction(deleteService);
-
-    QWidgetAction *plog = new QWidgetAction(this);
-
 }
 
 void MainWindow::m_createActions()
@@ -202,11 +205,25 @@ void MainWindow::m_createActions()
     addCategory = new QAction(tr("&Добавить категорию"), this);
     addCategory->setShortcuts(QKeySequence::New);
     addCategory->setStatusTip(tr("Добавить новую категорию"));
-//    connect(newAct, &QAction::triggered, this, &MainWindow::addCategory);
 
     deleteCategory = new QAction(tr("&Удалить выбранную категорию"), this);
 
     addService = new QAction(tr("&Добавить сервис"), this);
     deleteService = new QAction(tr("&Удалить выбранный сервис"), this);
+}
 
+void MainWindow::m_copyPasswordToClipboard() {
+    clipboard->setText(service.password);
+}
+
+void MainWindow::m_showPassword() {
+    passwordLine->setText(service.password);
+    showHidePasswordButton->setText(tr("Скрыть пароль"));
+    connect(showHidePasswordButton, SIGNAL(clicked()),this,SLOT(m_hidePassword()));
+}
+
+void MainWindow::m_hidePassword() {
+    passwordLine->setText(tr(TEXT_PASSWORD_HIDDEN));
+    showHidePasswordButton->setText(tr("Показать пароль"));
+    connect(showHidePasswordButton, SIGNAL(clicked()),this,SLOT(m_showPassword()));
 }
