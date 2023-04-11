@@ -9,6 +9,7 @@
 #include <QPushButton>
 #include <QTextEdit>
 #include <QVBoxLayout>
+#include <db.h>
 using namespace std;
 
 typedef struct Service{
@@ -29,6 +30,7 @@ public:
     ~MainWindow();
 
 private:
+    Db db;
     QAction *addCategory;
     QAction *addService;
     QAction *deleteCategory;
@@ -49,6 +51,7 @@ private:
     QPushButton *generateButton;
     QPushButton *saveButton;
     QPushButton *showHidePasswordButton;
+    QSqlQueryModel *categoriesModel;
 
     service_t service;
     QGridLayout *m_getDetailsButtons();

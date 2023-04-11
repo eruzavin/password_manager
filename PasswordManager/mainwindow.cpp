@@ -53,15 +53,19 @@ QVBoxLayout *MainWindow::m_getCategoriesLayout()
     QLabel *layoutLabel = new QLabel(tr("Категория:"));
 
     // Временная реализация модели
-    QStringListModel *categoriesModel = new QStringListModel();
-    QStringList list;
-    list << "Работа" << "Соцсети" << "Разное";
-    categoriesModel->setStringList(list);
+//    QStringListModel *categoriesModel = new QStringListModel();
+//    QStringList list;
+//    list << "Работа" << "Соцсети" << "Разное";
+//    categoriesModel->setStringList(list);
+
+    categoriesModel = db.getCategories();
 
     categoriesListView = new QListView();
     categoriesListView->setWordWrap(true);
     categoriesListView->setModel(categoriesModel);
     categoriesListView->setCurrentIndex(categoriesModel->index(0, 0));
+
+//    categoriesModel = db.getCategories();
 
 //    connect(categoriesListView, SIGNAL(customContextMenuRequested(QPoint)), this, SLOT(slotCustomMenuRequested(QPoint)));
 
