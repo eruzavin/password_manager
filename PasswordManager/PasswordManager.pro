@@ -14,6 +14,8 @@ SOURCES += \
     mainwindow.cpp
 
 HEADERS += \
+    storageInterface.h \
+    storagefactory.h \
     db.h \
     mainwindow.h
 

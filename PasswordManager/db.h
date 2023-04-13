@@ -2,8 +2,9 @@
 #define DB_H
 
 #include <QSqlQueryModel>
+#include "storageInterface.h"
 
-class Db
+class Db : storageInterface
 {
 public:
     Db();

@@ -9,7 +9,7 @@
 #include <QPushButton>
 #include <QTextEdit>
 #include <QVBoxLayout>
-#include <db.h>
+#include <StorageFactory.h>
 using namespace std;
 
 typedef struct Service{
@@ -30,7 +30,9 @@ public:
     ~MainWindow();
 
 private:
-    Db db;
+    StorageFactory storageFactory;
+    Db *storage = storageFactory.createStorage();
+
     QAction *addCategory;
     QAction *addService;
     QAction *deleteCategory;
