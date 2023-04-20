@@ -37,6 +37,8 @@ private:
     QAction *addService;
     QAction *deleteCategory;
     QAction *deleteService;
+    QAction *renameCategory;
+    QAction *renameService;
     QClipboard *clipboard;
     QLineEdit *commentLine;
     QLineEdit *dateModifiedLine;

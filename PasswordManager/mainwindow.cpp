@@ -190,9 +190,11 @@ void MainWindow::m_createMenus()
 {
     menu = menuBar()->addMenu(tr("&Меню"));
     menu->addAction(addCategory);
+    menu->addAction(renameCategory);
     menu->addAction(deleteCategory);
     menu->addSeparator();
     menu->addAction(addService);
+    menu->addAction(renameService);
     menu->addAction(deleteService);
 }
 
@@ -202,10 +204,12 @@ void MainWindow::m_createActions()
     addCategory->setShortcuts(QKeySequence::New);
     addCategory->setStatusTip(tr("Добавить новую категорию"));
 
-    deleteCategory = new QAction(tr("&Удалить выбранную категорию"), this);
+    renameCategory = new QAction(tr("&Переименовать категорию"), this);
+    deleteCategory = new QAction(tr("&Удалить категорию"), this);
 
     addService = new QAction(tr("&Добавить сервис"), this);
-    deleteService = new QAction(tr("&Удалить выбранный сервис"), this);
+    renameService = new QAction(tr("&Переименовать сервис"), this);
+    deleteService = new QAction(tr("&Удалить сервис"), this);
 }
 
 void MainWindow::m_copyPasswordToClipboard() {
